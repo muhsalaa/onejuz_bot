@@ -1,20 +1,12 @@
 const { isInRange, isSequential } = require('../helpers');
 
-function handleSingleJuzReport(msg, bot, juz) {
-  bot.sendMessage(
-    msg.chat.id,
-    `Barakallah, kamu telah membaca juz *${juz}*. Semoga istiqomah dan selalu semangat.`,
-    { parse_mode: 'Markdown' }
-  );
-}
-
-function handleMultipleJuzReport(msg, bot, juzMultiple) {
+function handleJuzReport(msg, bot, juzMultiple) {
   const juzArray = juzMultiple.map(Number);
 
   // check if juz read are valid
   if (isInRange(juzArray)) {
     // check if juz read is sequential
-    if (isSequential(juzArray)) {
+    if (juzArray.length === 1 || isSequential(juzArray)) {
       bot.sendMessage(
         msg.chat.id,
         `Barakallah, kamu telah membaca juz *${juzArray
@@ -33,4 +25,4 @@ function handleMultipleJuzReport(msg, bot, juzMultiple) {
   }
 }
 
-module.exports = { handleSingleJuzReport, handleMultipleJuzReport };
+module.exports = { handleJuzReport };
