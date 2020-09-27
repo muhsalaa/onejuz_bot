@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+const { Schema, model } = require('mongoose');
 
-const UserSchema = new mongoose.Schema(
+const UserSchema = new Schema(
   {
     user_id: {
       type: Number,
@@ -16,13 +16,10 @@ const UserSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['admin', 'user'],
-      default: 'user',
+      enum: ['creator', 'member'],
+      default: 'member',
     },
     last_juz_read: {
-      type: Number,
-    },
-    juz_read_monthly: {
       type: Number,
     },
     last_juz_report: {
@@ -42,4 +39,4 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = model('User', UserSchema);
