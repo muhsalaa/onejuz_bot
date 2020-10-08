@@ -1,39 +1,51 @@
 // handler
-const { start, welcome, register, rename } = require('./general');
+const { start, welcome, register, rename, restart } = require('./general');
 const { handleJuzReport } = require('./report');
+const { dailyStatisticGenerator } = require('./statistics');
+const { botSend } = require('../helpers');
 
-function oneJuzBot(msg, bot) {
+const { INVALID_INPUT } = require('../consts/response');
+
+async function oneJuzBot(msg, bot) {
   const juzValue = msg.text.match(/\d+/g);
+  let response;
 
   // handle juz report
   if (juzValue) {
-    handleJuzReport(msg, bot, juzValue);
+    response = await handleJuzReport(msg, juzValue);
+  }
+
+  // get statistics
+  else if (msg.text === '/statistics') {
+    response = await dailyStatisticGenerator(msg);
   }
 
   // start handler
   else if (msg.text === '/start') {
-    start(msg, bot);
+    response = await start(msg);
   }
 
   // register admin
   else if (msg.text === '/register') {
-    register(msg, bot);
+    response = await register(msg, bot);
   }
 
-  // register admin
-  else if (msg.text === '/register') {
-    register(msg, bot);
+  // restart read
+  else if (msg.text === '/restart ulangi bacaan') {
+    response = await restart(msg, bot);
   }
 
   // rename user
   else if (/\/rename [A-Za-z ]+/.test(msg.text)) {
-    rename(msg, bot);
+    response = await rename(msg);
   }
 
   // unhandled case
   else {
-    bot.sendMessage(msg.chat.id, 'Input tidak valid');
+    response = { target: msg.chat.id, message: INVALID_INPUT };
   }
+
+  botSend(bot, response);
 }
 
 module.exports = {

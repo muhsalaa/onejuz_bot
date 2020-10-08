@@ -8,10 +8,10 @@ const {
 } = require('../consts/response');
 
 /**
- * Global handler for juz single or multiple read report
+ * Global handler for single or multiple juz read report
  * @param {Array} juzMultiple - array of number of juz member read
  */
-async function handleJuzReport(msg, bot, juzMultiple) {
+async function handleJuzReport(msg, juzMultiple) {
   const juzArray = juzMultiple.map(Number);
   const { id: user_id } = msg.from;
 
@@ -19,40 +19,32 @@ async function handleJuzReport(msg, bot, juzMultiple) {
 
   // check if juz read are valid
   if (!isInRange(juzArray)) {
-    bot.sendMessage(msg.chat.id, INVALID_INPUT);
-    return false;
+    return { target: msg.chat.id, message: INVALID_INPUT };
   }
 
   // check if juz read is sequential
   if (!isSequential(juzArray)) {
-    bot.sendMessage(msg.chat.id, JUZ_REPORT_ERROR);
-    return false;
+    return { target: msg.chat.id, message: JUZ_REPORT_ERROR };
   }
 
   // if user is first time reporting
   if (!user.last_juz_read) {
-    sendSuccessResponse(msg, user, user_id, juzArray);
-    return true;
+    return sendSuccessResponse(msg, user, user_id, juzArray);
   }
 
   // check if last juz read is continous
   const { last_juz_read } = user;
   if (!lastJuzReadContinue(last_juz_read, juzArray)) {
-    bot.sendMessage(
-      msg.chat.id,
-      JUZ_REPORT_NOT_CONTINUES(last_juz_read, juzArray[0]),
-      {
-        parse_mode: 'Markdown',
-      }
-    );
-
-    return false;
+    return {
+      target: msg.chat.id,
+      message: JUZ_REPORT_NOT_CONTINUES(last_juz_read, juzArray[0]),
+    };
   }
 
-  sendSuccessResponse(msg, bot, user, user_id, juzArray);
+  return sendSuccessResponse(msg, user, user_id, juzArray);
 }
 
-async function sendSuccessResponse(msg, bot, user, user_id, juzArray) {
+async function sendSuccessResponse(msg, user, user_id, juzArray) {
   await User.updateOne(
     { user_id },
     {
@@ -62,9 +54,10 @@ async function sendSuccessResponse(msg, bot, user, user_id, juzArray) {
     }
   );
 
-  bot.sendMessage(msg.chat.id, JUZ_REPORT(user.name, juzArray.join(', ')), {
-    parse_mode: 'Markdown',
-  });
+  return {
+    target: msg.chat.id,
+    message: JUZ_REPORT(user.name, juzArray.join(', ')),
+  };
 }
 
 module.exports = { handleJuzReport };

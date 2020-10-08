@@ -7,22 +7,17 @@ const {
   WELCOME,
   ADMIN_REGISTRATION_SUCCESS,
   ADMIN_REGISTERED,
+  START_MESSAGE,
+  RESTART,
 } = require('../consts/response');
+const { getName } = require('../helpers');
 
 /**
  * Welcome user to bot and show guide
  * - guide not ready yet lol
  */
-function start(msg, bot) {
-  bot.sendMessage(
-    msg.chat.id,
-    `*Bismillah*, mari memulai tilawah 1 juz perhari, semoga istiqomah \u{1F603}.
-    
-Berikut cara laporan tilawah dan fitur bot lain:
-1. Untuk laporan satu juz bisa langsung mengetikkan juz yang sudah dibaca, misal *Juz 3 kholas* atau hanya *3* saja.
-2. Untuk laporan lebih dari satu juz bisa mengetikkan nomor juz secara berurutan, misal *juz 3, 4 5 kholas* atau hanya angka juz saja seperti *29 30 1 2*. Pastikan ada jeda antara angka juz, baik spasi atau karakter lainya.`,
-    { parse_mode: 'Markdown' }
-  );
+function start(msg) {
+  return { target: msg.chat.id, message: START_MESSAGE };
 }
 
 /**
@@ -37,9 +32,9 @@ async function register(msg, bot) {
   const user = await User.findOne({ user_id });
 
   if (user && user.role === 'creator') {
-    bot.sendMessage(group_id, ADMIN_REGISTERED);
+    return { target: group_id, message: ADMIN_REGISTERED };
   } else if (user && user.role !== 'creator') {
-    bot.sendMessage(group_id, INVALID_INPUT);
+    return { target: group_id, message: INVALID_INPUT };
   } else {
     const queryAdministrators = await bot.getChatAdministrators(group_id);
     const creator = queryAdministrators.find(
@@ -61,7 +56,7 @@ async function register(msg, bot) {
       members: [newAdmin._id],
     });
 
-    bot.sendMessage(group_id, ADMIN_REGISTRATION_SUCCESS);
+    return { target: group_id, message: ADMIN_REGISTRATION_SUCCESS };
   }
 }
 
@@ -70,7 +65,7 @@ async function register(msg, bot) {
  * - when user added or join, they will greeted by this function
  * - then insert their data to database User and Group
  */
-async function welcome(msg, bot) {
+async function welcome(msg) {
   const {
     id: user_id,
     first_name,
@@ -88,12 +83,11 @@ async function welcome(msg, bot) {
   const user = await User.findOne({ user_id });
 
   if (user) {
-    bot.sendMessage(group_id, WELCOME_BACK(user.name, title), {
-      parse_mode: 'Markdown',
-    });
+    return { target: group_id, message: WELCOME_BACK(user.name, title) };
   } else {
+    const name = getName({ first_name, last_name });
     const newUser = await User.create({
-      name: `${first_name} ${last_name}`.trim(),
+      name,
       user_id,
       username: `@${username}`,
       group_id,
@@ -101,22 +95,33 @@ async function welcome(msg, bot) {
 
     await Group.updateOne({ group_id }, { $push: { members: newUser._id } });
 
-    bot.sendMessage(group_id, WELCOME(first_name, last_name, title), {
-      parse_mode: 'Markdown',
-    });
+    return { target: group_id, message: WELCOME(name, title) };
   }
 }
 
-async function rename(msg, bot) {
+async function rename(msg) {
   const { id: user_id } = msg.from;
   const { id: group_id, title } = msg.chat;
   const newName = msg.text.split('/rename')[1].trim();
 
   await User.updateOne({ user_id }, { name: newName });
 
-  bot.sendMessage(group_id, WELCOME_BACK(newName, title), {
-    parse_mode: 'Markdown',
-  });
+  return { target: group_id, message: WELCOME_BACK(newName, title) };
 }
 
-module.exports = { start, welcome, register, rename };
+async function restart(msg) {
+  const { id: user_id } = msg.from;
+  const { id: group_id, title } = msg.chat;
+
+  await User.updateOne(
+    { user_id },
+    {
+      last_juz_read: null,
+      last_juz_report: new Date().toISOString(),
+    }
+  );
+
+  return { target: group_id, message: RESTART };
+}
+
+module.exports = { start, welcome, register, rename, restart };

@@ -6,6 +6,7 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "mongoose": "^5.10.6",
+    "node-cron": "^2.0.3",
     "node-telegram-bot-api": "^0.50.0"
   }
 }
