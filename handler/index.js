@@ -1,5 +1,12 @@
 // handler
-const { start, welcome, register, rename, restart } = require('./general');
+const {
+  start,
+  welcome,
+  register,
+  rename,
+  restart,
+  remove,
+} = require('./general');
 const { handleJuzReport } = require('./report');
 const { dailyStatisticGenerator } = require('./statistics');
 const { botSend } = require('../helpers');
@@ -51,4 +58,5 @@ async function oneJuzBot(msg, bot) {
 module.exports = {
   oneJuzBot,
   welcome,
+  remove,
 };

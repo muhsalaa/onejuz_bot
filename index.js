@@ -7,7 +7,7 @@ const token = process.env.TELEGRAM_BOT_TOKEN;
 
 const bot = new TeleBot(token, { polling: true });
 
-const { oneJuzBot, welcome } = require('./handler');
+const { oneJuzBot, welcome, remove } = require('./handler');
 
 connectDB();
 
@@ -17,4 +17,8 @@ bot.on('text', (msg) => {
 
 bot.on('new_chat_members', (msg) => {
   welcome(msg, bot);
+});
+
+bot.on('left_chat_member', (msg) => {
+  remove(msg, bot);
 });

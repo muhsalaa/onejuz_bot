@@ -40,8 +40,14 @@ const TEMPLATE = (
   members,
   kholas,
   notKholas,
-  total
+  total,
+  date,
+  group
 ) => `o  ⁠⁠⁠بِسْـــــــــمِ اللهِ الرَّحْمَٰنِ الرَّحِيْمِ  o
+
+Berikut adalah list tilawah Group ${group}
+Periode: ${date.solar}
+(${date.lunar})
 
 ${notReport} : Belum lapor
 ${notReportOnce} : Tidak lapor 1x

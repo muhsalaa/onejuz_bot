@@ -14,6 +14,11 @@ const juz = [
   21,22,23,24,25,26,27,28,29,30
 ];
 
+/**
+ * Generate string of current user read statistics
+ * @param {object} member - user data
+ * @param {number} gap - gap of last read time with current time in days
+ */
 function memberReportGenerator(member, gap) {
   const { last_juz_read, name } = member;
 

@@ -1,8 +1,10 @@
+const moment = require('moment-hijri');
+
 const User = require('../models/user');
 const Group = require('../models/group');
 
 const { UNAUTHORIZED, TEMPLATE } = require('../consts/response');
-const { getDaysGap } = require('../helpers/date');
+const { getDaysGap, idDateFormat } = require('../helpers/date');
 const { memberReportGenerator } = require('../helpers/report');
 
 /**
@@ -21,11 +23,17 @@ async function dailyStatisticGenerator(msg) {
   }
 
   const members = await User.find({ group_id });
+  const group = await Group.findOne({ group_id });
   let kholas = 0;
   let notKholas = 0;
   let memberStat = '';
   const total = members.length;
+  const date = {
+    solar: idDateFormat(new Date()),
+    lunar: moment().format('iD iMMM iYYYY'),
+  };
 
+  // generate report
   members.forEach((member) => {
     const gap = getDaysGap(member.last_juz_report);
     memberStat += memberReportGenerator(member, gap);
@@ -38,7 +46,14 @@ async function dailyStatisticGenerator(msg) {
 
   return {
     target: group_id,
-    message: TEMPLATE(memberStat, kholas, notKholas, total),
+    message: TEMPLATE(
+      memberStat,
+      kholas,
+      notKholas,
+      total,
+      date,
+      group.group_name
+    ),
   };
 }
 

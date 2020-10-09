@@ -41,9 +41,9 @@ async function register(msg, bot) {
       (item) => item.status === 'creator'
     );
     const { first_name, last_name, username } = creator.user;
-
+    const name = getName({ first_name, last_name });
     const newAdmin = await User.create({
-      name: `${first_name} ${last_name}`.trim(),
+      name,
       user_id,
       username: `@${username}`,
       group_id,
@@ -80,23 +80,17 @@ async function welcome(msg) {
     return false;
   }
 
-  const user = await User.findOne({ user_id });
+  const name = getName({ first_name, last_name });
+  const newUser = await User.create({
+    name,
+    user_id,
+    username: `@${username}`,
+    group_id,
+  });
 
-  if (user) {
-    return { target: group_id, message: WELCOME_BACK(user.name, title) };
-  } else {
-    const name = getName({ first_name, last_name });
-    const newUser = await User.create({
-      name,
-      user_id,
-      username: `@${username}`,
-      group_id,
-    });
+  await Group.updateOne({ group_id }, { $addToSet: { members: newUser._id } });
 
-    await Group.updateOne({ group_id }, { $push: { members: newUser._id } });
-
-    return { target: group_id, message: WELCOME(name, title) };
-  }
+  return { target: group_id, message: WELCOME(name, title) };
 }
 
 async function rename(msg) {
@@ -111,7 +105,7 @@ async function rename(msg) {
 
 async function restart(msg) {
   const { id: user_id } = msg.from;
-  const { id: group_id, title } = msg.chat;
+  const { id: group_id } = msg.chat;
 
   await User.updateOne(
     { user_id },
@@ -124,4 +118,24 @@ async function restart(msg) {
   return { target: group_id, message: RESTART };
 }
 
-module.exports = { start, welcome, register, rename, restart };
+/**
+ * Remove user from database when leaving group
+ */
+async function remove(msg) {
+  const { id: user_id, is_bot } = msg.left_chat_member;
+  const { id: group_id } = msg.chat;
+
+  // if odoj bot deleted, delete group and all of its member data
+  if (is_bot && user_id == process.env.BOT_ID) {
+    await Group.findOneAndDelete({ group_id });
+    await User.deleteMany({ group_id });
+  }
+
+  // delete member in database and pull its id from group data
+  else {
+    const user = await User.findOneAndDelete({ user_id });
+    await Group.updateOne({ group_id }, { $pull: { members: user._id } });
+  }
+}
+
+module.exports = { start, welcome, register, rename, restart, remove };
