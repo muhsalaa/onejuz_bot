@@ -3,4 +3,9 @@ function getName(user) {
   return name.join(' ').trim();
 }
 
-module.exports = { getName };
+function notStartedWith(string, data) {
+  const checkStringContent = data.map((x) => string.startsWith(x));
+  return checkStringContent.filter(Boolean).length === 0;
+}
+
+module.exports = { getName, notStartedWith };

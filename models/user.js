@@ -12,11 +12,11 @@ const UserSchema = new Schema(
     },
     username: {
       type: String,
-      required: [true, 'Please add a name'],
+      required: [true, 'Please add a username'],
     },
     role: {
       type: String,
-      enum: ['creator', 'member'],
+      enum: ['creator', 'member', 'admin'],
       default: 'member',
     },
     last_juz_read: {

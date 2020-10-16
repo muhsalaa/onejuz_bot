@@ -2,13 +2,14 @@ const User = require('../models/user');
 const Group = require('../models/group');
 
 const {
-  WELCOME_BACK,
   INVALID_INPUT,
   WELCOME,
   ADMIN_REGISTRATION_SUCCESS,
   ADMIN_REGISTERED,
   START_MESSAGE,
   RESTART,
+  RENAME_GROUP,
+  RENAME_USER,
 } = require('../consts/response');
 const { getName } = require('../helpers');
 
@@ -86,6 +87,7 @@ async function welcome(msg) {
     user_id,
     username: `@${username}`,
     group_id,
+    last_juz_report: new Date().toISOString(),
   });
 
   await Group.updateOne({ group_id }, { $addToSet: { members: newUser._id } });
@@ -93,6 +95,9 @@ async function welcome(msg) {
   return { target: group_id, message: WELCOME(name, title) };
 }
 
+/**
+ * Rename user
+ */
 async function rename(msg) {
   const { id: user_id } = msg.from;
   const { id: group_id, title } = msg.chat;
@@ -100,7 +105,27 @@ async function rename(msg) {
 
   await User.updateOne({ user_id }, { name: newName });
 
-  return { target: group_id, message: WELCOME_BACK(newName, title) };
+  return { target: group_id, message: RENAME_USER };
+}
+
+/**
+ * Rename group
+ */
+async function renameGroup(msg) {
+  const { id: user_id } = msg.from;
+  const { id: group_id } = msg.chat;
+  const newName = msg.text.split('/renameg')[1].trim();
+  const user = await User.findOne({ user_id });
+
+  console.log(user);
+
+  if (user && user.role === 'creator') {
+    await Group.updateOne({ group_id }, { group_name: newName });
+
+    return { target: group_id, message: RENAME_GROUP };
+  }
+
+  return { target: group_id, message: INVALID_INPUT };
 }
 
 async function restart(msg) {
@@ -138,4 +163,12 @@ async function remove(msg) {
   }
 }
 
-module.exports = { start, welcome, register, rename, restart, remove };
+module.exports = {
+  start,
+  welcome,
+  register,
+  rename,
+  restart,
+  remove,
+  renameGroup,
+};

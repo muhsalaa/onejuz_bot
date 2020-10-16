@@ -24,9 +24,11 @@ function memberReportGenerator(member, gap) {
 
   switch (gap) {
     case 0:
-      return `${openBook} ${
-        (last_juz_read > 9 ? last_juz_read : '0' + last_juz_read) || 'XX'
-      } ${checkMark} ${name}\n`;
+      return last_juz_read
+        ? `${openBook} ${
+            (last_juz_read > 9 ? last_juz_read : '0' + last_juz_read) || 'XX'
+          } ${checkMark} ${name}\n`
+        : `${openBook} XX ${notReport} ${name}\n`;
     case 1:
       return `${openBook} XX ${notReport} ${name}\n`;
     case 2:

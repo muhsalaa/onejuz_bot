@@ -10,8 +10,8 @@ const {
 
 // GENERAL
 const INVALID_INPUT = 'Input tidak valid';
-const WELCOME_BACK = (userName, groupTitle) =>
-  `Ahlan wa Sahlan, selamat datang kembali *${userName}* di grup odoj *${groupTitle}*`;
+const RENAME_USER = 'Nama berhasil dirubah';
+const RENAME_GROUP = 'Nama group berhasil dirubah';
 const WELCOME = (name, groupTitle) =>
   `Ahlan wa Sahlan *${name}* di grup odoj *${groupTitle}*`;
 const ADMIN_REGISTRATION_SUCCESS = 'Registrasi administrator berhasil';
@@ -47,7 +47,7 @@ const TEMPLATE = (
 
 Berikut adalah list tilawah Group ${group}
 Periode: ${date.solar}
-(${date.lunar})
+Hijri: ${date.lunar}
 
 ${notReport} : Belum lapor
 ${notReportOnce} : Tidak lapor 1x
@@ -63,13 +63,14 @@ Semoga menambah berkah hidup kita dan keluarga. Aamiin ...
 
 Lapor satuan, ketik : lapor juz x/ juz x/ x
 Lapor banyak, ketik : lapor juz x, y, z (harus urut)
-untuk update secara otomatis. List harian berubah otomatis pada jam 00:00.
+untuk update secara otomatis. List harian berubah otomatis pada jam 23:59.
 `;
 
 module.exports = {
   INVALID_INPUT,
   WELCOME,
-  WELCOME_BACK,
+  RENAME_USER,
+  RENAME_GROUP,
   ADMIN_REGISTERED,
   ADMIN_REGISTRATION_SUCCESS,
   JUZ_REPORT,

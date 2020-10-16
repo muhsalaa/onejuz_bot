@@ -6,6 +6,7 @@ const {
   rename,
   restart,
   remove,
+  renameGroup,
 } = require('./general');
 const { handleJuzReport } = require('./report');
 const { dailyStatisticGenerator } = require('./statistics');
@@ -17,13 +18,8 @@ async function oneJuzBot(msg, bot) {
   const juzValue = msg.text.match(/\d+/g);
   let response;
 
-  // handle juz report
-  if (juzValue) {
-    response = await handleJuzReport(msg, juzValue);
-  }
-
   // get statistics
-  else if (msg.text === '/statistics') {
+  if (msg.text === '/statistics') {
     response = await dailyStatisticGenerator(msg);
   }
 
@@ -47,6 +43,16 @@ async function oneJuzBot(msg, bot) {
     response = await rename(msg);
   }
 
+  // rename group
+  else if (/\/renameg [A-Za-z0-9# ]+/.test(msg.text)) {
+    response = await renameGroup(msg);
+  }
+
+  // handle juz report
+  else if (juzValue) {
+    response = await handleJuzReport(msg, juzValue);
+  }
+
   // unhandled case
   else {
     response = { target: msg.chat.id, message: INVALID_INPUT };
@@ -55,8 +61,13 @@ async function oneJuzBot(msg, bot) {
   botSend(bot, response);
 }
 
+async function newUser(msg, bot) {
+  const response = await welcome(msg);
+  botSend(bot, response);
+}
+
 module.exports = {
   oneJuzBot,
-  welcome,
+  newUser,
   remove,
 };
