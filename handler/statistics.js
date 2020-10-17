@@ -2,10 +2,22 @@ const moment = require('moment-hijri');
 
 const User = require('../models/user');
 const Group = require('../models/group');
+const Report = require('../models/report');
 
-const { UNAUTHORIZED, TEMPLATE } = require('../consts/response');
-const { getDaysGap, idDateFormat } = require('../helpers/date');
-const { memberReportGenerator } = require('../helpers/report');
+const {
+  UNAUTHORIZED,
+  TEMPLATE,
+  TEMPLATE_WEEKLY,
+} = require('../consts/response');
+const {
+  getDaysGap,
+  idDateFormat,
+  getSunday,
+  shortDateFormat,
+  memberReportGenerator,
+  memberWeeklyReportGenerator,
+  recordReset,
+} = require('../helpers');
 
 /**
  * Daily read report
@@ -64,4 +76,32 @@ async function dailyStatisticGenerator(msg, groupIdCron) {
   };
 }
 
-module.exports = { dailyStatisticGenerator };
+async function weeklyStatisticGenerator(group) {
+  const { members, group_name, group_id } = group;
+
+  let memberStat = '';
+  const period = {
+    solarFrom: shortDateFormat(getSunday()),
+    solarTo: shortDateFormat(new Date()),
+    lunarFrom: moment(getSunday()).format('iD iMMM iYYYY'),
+    lunarTo: moment().format('iD iMMM iYYYY'),
+  };
+
+  for (const member of members) {
+    const record = Object.values(member.report._doc);
+    memberStat += memberWeeklyReportGenerator(member, record);
+    await Report.updateOne(
+      { _id: member.report.$__._id },
+      {
+        ...recordReset(member.report[6]),
+      }
+    );
+  }
+
+  return {
+    target: group.group_id,
+    message: TEMPLATE_WEEKLY(memberStat, period, group_name),
+  };
+}
+
+module.exports = { dailyStatisticGenerator, weeklyStatisticGenerator };

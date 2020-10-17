@@ -65,6 +65,21 @@ Lapor satuan, ketik : lapor juz x/ juz x/ x
 Lapor banyak, ketik : lapor juz x, y, z (harus urut)
 untuk update secara otomatis. List harian berubah otomatis pada jam 23:59.
 `;
+const TEMPLATE_WEEKLY = (
+  members,
+  date,
+  group
+) => `o  ⁠⁠⁠بِسْـــــــــمِ اللهِ الرَّحْمَٰنِ الرَّحِيْمِ  o
+
+Berikut adalah list tilawah Group ${group}
+Periode: ${date.solarFrom} - ${date.solarTo}
+Hijri: ${date.lunarFrom} - ${date.lunarTo}
+
+${members}
+
+Tetap SEMANGAT dan ISTIQOMAH TILAWAH sebelum tidur (dan kholas sebelum batas waktu).
+Semoga menambah berkah hidup kita dan keluarga. Aamiin ...
+`;
 
 module.exports = {
   INVALID_INPUT,
@@ -80,4 +95,5 @@ module.exports = {
   RESTART,
   UNAUTHORIZED,
   TEMPLATE,
+  TEMPLATE_WEEKLY,
 };

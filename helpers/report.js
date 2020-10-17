@@ -14,6 +14,14 @@ const juz = [
   21,22,23,24,25,26,27,28,29,30
 ];
 
+const recordSymbol = {
+  0: checkMark,
+  1: notReport,
+  2: notReportOnce,
+  3: notReportTwice,
+  4: notReportMore,
+};
+
 /**
  * Generate string of current user read statistics
  * @param {object} member - user data
@@ -22,22 +30,21 @@ const juz = [
 function memberReportGenerator(member, gap) {
   const { last_juz_read, name } = member;
 
-  switch (gap) {
-    case 0:
-      return last_juz_read
-        ? `${openBook} ${
-            (last_juz_read > 9 ? last_juz_read : '0' + last_juz_read) || 'XX'
-          } ${checkMark} ${name}\n`
-        : `${openBook} XX ${notReport} ${name}\n`;
-    case 1:
-      return `${openBook} XX ${notReport} ${name}\n`;
-    case 2:
-      return `${openBook} XX ${notReportOnce} ${name}\n`;
-    case 3:
-      return `${openBook} XX ${notReportTwice} ${name}\n`;
-    default:
-      return `${openBook} XX ${notReportMore} ${name}\n`;
+  if (gap === 0) {
+    return last_juz_read
+      ? `${openBook} ${
+          (last_juz_read > 9 ? last_juz_read : '0' + last_juz_read) || 'XX'
+        } ${checkMark} ${name}\n`
+      : `${openBook} XX ${notReport} ${name}\n`;
+  } else {
+    return `${openBook} XX ${recordSymbol[gap] || notReportMore} ${name}\n`;
   }
+}
+
+function memberWeeklyReportGenerator(member, record) {
+  const recordArray = record.map((rec) => recordSymbol[rec] || notReportMore);
+  const recordString = recordArray.join('');
+  return `${recordString} ${member.name}\n`;
 }
 
 function isInRange(juzArray) {
@@ -66,9 +73,25 @@ function lastJuzReadContinue(lastRead, currentRead) {
   return false;
 }
 
+function recordNormalizer(today) {
+  const data = {};
+  for (let x = 1; x < 7 - today; x++) {
+    data[today + x] = x;
+  }
+  return data;
+}
+
+function recordReset(last) {
+  const arr = Array.from({ length: 7 }, (_, i) => i + last + 1);
+  return Object.assign({}, arr);
+}
+
 module.exports = {
   isInRange,
   isSequential,
   lastJuzReadContinue,
   memberReportGenerator,
+  memberWeeklyReportGenerator,
+  recordNormalizer,
+  recordReset,
 };

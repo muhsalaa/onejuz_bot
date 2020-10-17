@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const Group = require('../models/group');
+const Report = require('../models/report');
 
 const {
   INVALID_INPUT,
@@ -11,7 +12,7 @@ const {
   RENAME_GROUP,
   RENAME_USER,
 } = require('../consts/response');
-const { getName } = require('../helpers');
+const { getName, today } = require('../helpers');
 
 /**
  * Welcome user to bot and show guide
@@ -43,12 +44,17 @@ async function register(msg, bot) {
     );
     const { first_name, last_name, username } = creator.user;
     const name = getName({ first_name, last_name });
+
+    const report = await Report.create({
+      group_id,
+    });
     const newAdmin = await User.create({
       name,
       user_id,
       username: `@${username}`,
       group_id,
       role: creator.status,
+      report: report._id,
     });
 
     await Group.create({
@@ -82,12 +88,17 @@ async function welcome(msg) {
   }
 
   const name = getName({ first_name, last_name });
+
+  const report = await Report.create({
+    group_id,
+  });
   const newUser = await User.create({
     name,
     user_id,
     username: `@${username}`,
     group_id,
-    last_juz_report: new Date().toISOString(),
+    // last_juz_report: new Date().toISOString(),
+    report: report._id,
   });
 
   await Group.updateOne({ group_id }, { $addToSet: { members: newUser._id } });
@@ -132,13 +143,17 @@ async function restart(msg) {
   const { id: user_id } = msg.from;
   const { id: group_id } = msg.chat;
 
-  await User.updateOne(
+  const user = await User.findOneAndUpdate(
     { user_id },
     {
-      last_juz_read: null,
       last_juz_report: new Date().toISOString(),
+      last_juz_read: 0,
     }
   );
+
+  await Report.findByIdAndUpdate(user.report, {
+    ...Object.assign({}, [1, 2, 3, 4, 5, 6, 7]),
+  });
 
   return { target: group_id, message: RESTART };
 }
@@ -154,6 +169,7 @@ async function remove(msg) {
   if (is_bot && user_id == process.env.BOT_ID) {
     await Group.findOneAndDelete({ group_id });
     await User.deleteMany({ group_id });
+    await Report.deleteMany({ group_id });
   }
 
   // delete member in database and pull its id from group data

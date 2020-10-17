@@ -8,7 +8,7 @@ const token = process.env.TELEGRAM_BOT_TOKEN;
 const bot = new TeleBot(token, { polling: true });
 
 const { oneJuzBot, newUser, remove } = require('./handler');
-const { reportDaily } = require('./scheduler');
+const { reportDaily, reportWeekly } = require('./scheduler');
 
 connectDB();
 
@@ -25,3 +25,4 @@ bot.on('left_chat_member', (msg) => {
 });
 
 reportDaily(bot);
+reportWeekly(bot);

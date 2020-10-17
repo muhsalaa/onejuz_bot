@@ -1,5 +1,12 @@
 const User = require('../models/user');
-const { isInRange, isSequential, lastJuzReadContinue } = require('../helpers');
+const Report = require('../models/report');
+const {
+  isInRange,
+  isSequential,
+  lastJuzReadContinue,
+  today,
+  recordNormalizer,
+} = require('../helpers');
 const {
   JUZ_REPORT,
   JUZ_REPORT_ERROR,
@@ -29,7 +36,7 @@ async function handleJuzReport(msg, juzMultiple) {
 
   // if user is first time reporting
   if (!user.last_juz_read) {
-    return sendSuccessResponse(msg, user, user_id, juzArray);
+    return sendSuccessResponse(msg, user, juzArray);
   }
 
   // check if last juz read is continous
@@ -41,18 +48,21 @@ async function handleJuzReport(msg, juzMultiple) {
     };
   }
 
-  return sendSuccessResponse(msg, user, user_id, juzArray);
+  return sendSuccessResponse(msg, user, juzArray);
 }
 
-async function sendSuccessResponse(msg, user, user_id, juzArray) {
-  await User.updateOne(
-    { user_id },
-    {
-      last_juz_read: juzArray[juzArray.length - 1],
-      $inc: { khatam: juzArray.includes(30) ? 1 : 0 },
-      last_juz_report: new Date().toISOString(),
-    }
-  );
+async function sendSuccessResponse(msg, user, juzArray) {
+  const thisDay = today();
+  await User.findByIdAndUpdate(user._id, {
+    last_juz_read: juzArray[juzArray.length - 1],
+    $inc: { khatam: juzArray.includes(30) ? 1 : 0 },
+    last_juz_report: new Date().toISOString(),
+  });
+
+  await Report.findByIdAndUpdate(user.report, {
+    [thisDay]: 0,
+    ...recordNormalizer(thisDay),
+  });
 
   return {
     target: msg.chat.id,

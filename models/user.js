@@ -19,21 +19,25 @@ const UserSchema = new Schema(
       enum: ['creator', 'member', 'admin'],
       default: 'member',
     },
-    last_juz_read: {
-      type: Number,
-    },
-    last_juz_report: {
-      type: String,
-    },
-    khatam: {
-      type: Number,
-    },
     group_id: {
       type: Number,
     },
     blacklisted: {
       type: Boolean,
       default: false,
+    },
+    report: {
+      type: Schema.Types.ObjectId,
+      ref: 'Report',
+    },
+    last_juz_report: {
+      type: String,
+    },
+    last_juz_read: {
+      type: Number,
+    },
+    khatam: {
+      type: Number,
     },
   },
   { timestamps: true }
