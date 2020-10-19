@@ -1,5 +1,5 @@
 const User = require('../models/user');
-const Report = require('../models/report');
+const Record = require('../models/record');
 const {
   isInRange,
   isSequential,
@@ -51,6 +51,14 @@ async function handleJuzReport(msg, juzMultiple) {
   return sendSuccessResponse(msg, user, juzArray);
 }
 
+/**
+ * Send success response to user
+ * @param {Object} msg - Telegram message object
+ * @param {Object} user - user data
+ * @param {Array} juzArray - list of juz read by user
+ *
+ * @return {Object} - message and address to send
+ */
 async function sendSuccessResponse(msg, user, juzArray) {
   const thisDay = today();
   await User.findByIdAndUpdate(user._id, {
@@ -59,7 +67,7 @@ async function sendSuccessResponse(msg, user, juzArray) {
     last_juz_report: new Date().toISOString(),
   });
 
-  await Report.findByIdAndUpdate(user.report, {
+  await Record.findByIdAndUpdate(user.record, {
     [thisDay]: 0,
     ...recordNormalizer(thisDay),
   });

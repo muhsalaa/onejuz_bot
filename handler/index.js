@@ -9,10 +9,7 @@ const {
   renameGroup,
 } = require('./general');
 const { handleJuzReport } = require('./report');
-const {
-  dailyStatisticGenerator,
-  weeklyStatisticGenerator,
-} = require('./statistics');
+const { dailyStatisticGenerator } = require('./statistics');
 const { botSend } = require('../helpers');
 
 const { INVALID_INPUT } = require('../consts/response');

@@ -12,6 +12,8 @@ const {
 const INVALID_INPUT = 'Input tidak valid';
 const RENAME_USER = 'Nama berhasil dirubah';
 const RENAME_GROUP = 'Nama group berhasil dirubah';
+const BOT_ADDED =
+  'Bot berhasil dimasukkan, silahkan registrasi admin dengan mengetikkan /register';
 const WELCOME = (name, groupTitle) =>
   `Ahlan wa Sahlan *${name}* di grup odoj *${groupTitle}*`;
 const ADMIN_REGISTRATION_SUCCESS = 'Registrasi administrator berhasil';
@@ -84,6 +86,7 @@ Semoga menambah berkah hidup kita dan keluarga. Aamiin ...
 module.exports = {
   INVALID_INPUT,
   WELCOME,
+  BOT_ADDED,
   RENAME_USER,
   RENAME_GROUP,
   ADMIN_REGISTERED,

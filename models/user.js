@@ -26,9 +26,9 @@ const UserSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    report: {
+    record: {
       type: Schema.Types.ObjectId,
-      ref: 'Report',
+      ref: 'Record',
     },
     last_juz_report: {
       type: String,

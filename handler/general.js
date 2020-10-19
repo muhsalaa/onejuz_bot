@@ -1,10 +1,11 @@
 const User = require('../models/user');
 const Group = require('../models/group');
-const Report = require('../models/report');
+const Record = require('../models/record');
 
 const {
   INVALID_INPUT,
   WELCOME,
+  BOT_ADDED,
   ADMIN_REGISTRATION_SUCCESS,
   ADMIN_REGISTERED,
   START_MESSAGE,
@@ -12,7 +13,7 @@ const {
   RENAME_GROUP,
   RENAME_USER,
 } = require('../consts/response');
-const { getName, today } = require('../helpers');
+const { getName } = require('../helpers');
 
 /**
  * Welcome user to bot and show guide
@@ -45,7 +46,7 @@ async function register(msg, bot) {
     const { first_name, last_name, username } = creator.user;
     const name = getName({ first_name, last_name });
 
-    const report = await Report.create({
+    const record = await Record.create({
       group_id,
     });
     const newAdmin = await User.create({
@@ -54,7 +55,7 @@ async function register(msg, bot) {
       username: `@${username}`,
       group_id,
       role: creator.status,
-      report: report._id,
+      record: record._id,
     });
 
     await Group.create({
@@ -82,14 +83,17 @@ async function welcome(msg) {
   } = msg.new_chat_member;
   const { id: group_id, title } = msg.chat;
 
-  // if new member is bot, do nothing.
-  if (is_bot) {
-    return false;
+  // if new member is bot, send special message
+  if (is_bot && user_id === process.env.BOT_ID) {
+    return {
+      target: group_id,
+      message: BOT_ADDED,
+    };
   }
 
   const name = getName({ first_name, last_name });
 
-  const report = await Report.create({
+  const record = await Record.create({
     group_id,
   });
   const newUser = await User.create({
@@ -97,8 +101,7 @@ async function welcome(msg) {
     user_id,
     username: `@${username}`,
     group_id,
-    // last_juz_report: new Date().toISOString(),
-    report: report._id,
+    record: record._id,
   });
 
   await Group.updateOne({ group_id }, { $addToSet: { members: newUser._id } });
@@ -139,6 +142,10 @@ async function renameGroup(msg) {
   return { target: group_id, message: INVALID_INPUT };
 }
 
+/**
+ * Handler to restart user read state
+ * @param {Object} msg - Telegram message object
+ */
 async function restart(msg) {
   const { id: user_id } = msg.from;
   const { id: group_id } = msg.chat;
@@ -151,7 +158,7 @@ async function restart(msg) {
     }
   );
 
-  await Report.findByIdAndUpdate(user.report, {
+  await Record.findByIdAndUpdate(user.record, {
     ...Object.assign({}, [1, 2, 3, 4, 5, 6, 7]),
   });
 
@@ -169,7 +176,7 @@ async function remove(msg) {
   if (is_bot && user_id == process.env.BOT_ID) {
     await Group.findOneAndDelete({ group_id });
     await User.deleteMany({ group_id });
-    await Report.deleteMany({ group_id });
+    await Record.deleteMany({ group_id });
   }
 
   // delete member in database and pull its id from group data

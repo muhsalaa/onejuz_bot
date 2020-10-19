@@ -1,6 +1,6 @@
 const { Schema, model } = require('mongoose');
 
-const ReportSchema = new Schema({
+const RecordSchema = new Schema({
   // sunday
   0: {
     type: Number,
@@ -36,4 +36,4 @@ const ReportSchema = new Schema({
   },
 });
 
-module.exports = model('Report', ReportSchema);
+module.exports = model('Record', RecordSchema);

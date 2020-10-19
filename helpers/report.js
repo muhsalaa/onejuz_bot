@@ -1,3 +1,4 @@
+// emoji list of user reporting status
 const {
   openBook,
   notReport,
@@ -7,6 +8,7 @@ const {
   checkMark,
 } = require('../consts/emoji');
 
+// qur'an 30 Juz list
 // prettier-ignore
 const juz = [
   1,2,3,4,5,6,7,8,9,10,
@@ -14,6 +16,7 @@ const juz = [
   21,22,23,24,25,26,27,28,29,30
 ];
 
+// helper object to determine times user not reporting
 const recordSymbol = {
   0: checkMark,
   1: notReport,
@@ -23,34 +26,60 @@ const recordSymbol = {
 };
 
 /**
- * Generate string of current user read statistics
- * @param {object} member - user data
- * @param {number} gap - gap of last read time with current time in days
+ * Generate string of user daily read report
+ * @param {Object} member - user data
+ * @param {Number} gap - gap of last read time with current time in days
+ *
+ * @return {String}
  */
 function memberReportGenerator(member, gap) {
   const { last_juz_read, name } = member;
 
+  // return default if this is user first time report.
+  if (!last_juz_read) {
+    return `${openBook} XX ${notReport} ${name}\n`;
+  }
+
+  // return user read report based on day gap between last time user reported
   if (gap === 0) {
-    return last_juz_read
-      ? `${openBook} ${
-          (last_juz_read > 9 ? last_juz_read : '0' + last_juz_read) || 'XX'
-        } ${checkMark} ${name}\n`
-      : `${openBook} XX ${notReport} ${name}\n`;
+    const lastRead = last_juz_read.toString().padStart(2, '0');
+    return `${openBook} ${lastRead} ${checkMark} ${name}\n`;
   } else {
     return `${openBook} XX ${recordSymbol[gap] || notReportMore} ${name}\n`;
   }
 }
 
-function memberWeeklyReportGenerator(member, record) {
-  const recordArray = record.map((rec) => recordSymbol[rec] || notReportMore);
-  const recordString = recordArray.join('');
-  return `${recordString} ${member.name}\n`;
+/**
+ * Generate string of user weekly read report
+ * @param {Object} member - user data
+ * @param {Array} record - array of user not reporting record in a week
+ *
+ * @return {String}
+ */
+function memberWeeklyReportGenerator(member, records) {
+  const emojiRecords = records.map(
+    (record) => recordSymbol[record] || notReportMore
+  );
+  const userRecord = emojiRecords.join('');
+  return `${userRecord} ${member.name}\n`;
 }
 
+/**
+ * Helper to check if juz reported by user is in range, between 1-30
+ * @param {Array} juzArray - list of juz read by user
+ *
+ * @return {Boolean}
+ */
 function isInRange(juzArray) {
   return juzArray.every((x) => juz.includes(x));
 }
 
+/**
+ * Helper to check if juz read by user is sequesntial, i.e 23 24 25, or 30 1 2
+ * @param {Array} juzArray - list of juz read by user
+ *
+ * @return {Boolean}
+ */
 function isSequential(juzArray) {
   for (let x = 1; x < juzArray.length; x++) {
     let gap = Math.abs(juzArray[x - 1] - juzArray[x]);
@@ -62,6 +91,13 @@ function isSequential(juzArray) {
   return true;
 }
 
+/**
+ * Helper to check the last juz read by user is continous with last report, i.e 20 then 21
+ * @param {Number} lastRead - last juz read by user
+ * @param {Array} currentRead - list of juz read by user
+ *
+ * @return {Boolean}
+ */
 function lastJuzReadContinue(lastRead, currentRead) {
   if (
     lastRead + 1 === currentRead[0] ||
@@ -73,6 +109,12 @@ function lastJuzReadContinue(lastRead, currentRead) {
   return false;
 }
 
+/**
+ * Helper to create new sequential record object used to change record after user update his report
+ * @param {Number} today - number of day user updated his report
+ *
+ * @return {Object}
+ */
 function recordNormalizer(today) {
   const data = {};
   for (let x = 1; x < 7 - today; x++) {
@@ -81,6 +123,14 @@ function recordNormalizer(today) {
   return data;
 }
 
+/**
+ * Helper to reset record at end of the week
+ * if user not reported 3 times at last week, this helper will return
+ * object contain continued number from it
+ * @param {Number} last - last record value (key 6, indicating sturday)
+ *
+ * @return {Object} - i.e {0: 4, 1: 5 ... }
+ */
 function recordReset(last) {
   const arr = Array.from({ length: 7 }, (_, i) => i + last + 1);
   return Object.assign({}, arr);

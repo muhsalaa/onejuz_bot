@@ -2,7 +2,7 @@ const moment = require('moment-hijri');
 
 const User = require('../models/user');
 const Group = require('../models/group');
-const Report = require('../models/report');
+const Record = require('../models/record');
 
 const {
   UNAUTHORIZED,
@@ -76,6 +76,10 @@ async function dailyStatisticGenerator(msg, groupIdCron) {
   };
 }
 
+/**
+ * Send weekly group member report statistic
+ * @param {Object} group
+ */
 async function weeklyStatisticGenerator(group) {
   const { members, group_name, group_id } = group;
 
@@ -88,18 +92,18 @@ async function weeklyStatisticGenerator(group) {
   };
 
   for (const member of members) {
-    const record = Object.values(member.report._doc);
+    const record = Object.values(member.record._doc);
     memberStat += memberWeeklyReportGenerator(member, record);
-    await Report.updateOne(
-      { _id: member.report.$__._id },
+    await Record.updateOne(
+      { _id: member.record.$__._id },
       {
-        ...recordReset(member.report[6]),
+        ...recordReset(member.record[6]),
       }
     );
   }
 
   return {
-    target: group.group_id,
+    target: group_id,
     message: TEMPLATE_WEEKLY(memberStat, period, group_name),
   };
 }
