@@ -97,7 +97,7 @@ async function welcome(msg) {
   const { id: group_id, title } = msg.chat;
 
   // if new member is bot, send special message
-  if (is_bot && user_id === process.env.BOT_ID) {
+  if (is_bot && user_id == process.env.BOT_ID) {
     return {
       target: group_id,
       message: BOT_ADDED,
