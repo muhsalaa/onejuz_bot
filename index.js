@@ -13,7 +13,11 @@ const { reportDaily, reportWeekly } = require('./scheduler');
 connectDB();
 
 bot.on('text', (msg) => {
-  oneJuzBot(msg, bot);
+  if (msg.chat.type === 'group') {
+    oneJuzBot(msg, bot);
+  } else {
+    bot.sendMessage(msg.chat.id, 'Bot hanya bisa digunakan dalam grup');
+  }
 });
 
 bot.on('new_chat_members', async (msg) => {
