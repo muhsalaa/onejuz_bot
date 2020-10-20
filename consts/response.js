@@ -18,6 +18,7 @@ const WELCOME = (name, groupTitle) =>
   `Ahlan wa Sahlan *${name}* di grup odoj *${groupTitle}*`;
 const ADMIN_REGISTRATION_SUCCESS = 'Registrasi administrator berhasil';
 const ADMIN_REGISTERED = 'Kamu sudah terdaftar sebagai admin';
+const USER_REGISTERED = 'Kamu sudah terdaftar';
 const START_MESSAGE = `o  ⁠⁠⁠بِسْـــــــــمِ اللهِ الرَّحْمَٰنِ الرَّحِيْمِ  o
 
 mari memulai tilawah 1 juz perhari, semoga istiqomah ${smile}.
@@ -99,4 +100,5 @@ module.exports = {
   UNAUTHORIZED,
   TEMPLATE,
   TEMPLATE_WEEKLY,
+  USER_REGISTERED,
 };

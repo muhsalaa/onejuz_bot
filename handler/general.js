@@ -8,6 +8,7 @@ const {
   BOT_ADDED,
   ADMIN_REGISTRATION_SUCCESS,
   ADMIN_REGISTERED,
+  USER_REGISTERED,
   START_MESSAGE,
   RESTART,
   RENAME_GROUP,
@@ -33,38 +34,50 @@ async function register(msg, bot) {
   const { id: group_id, title } = msg.chat;
   const { id: user_id } = msg.from;
   const user = await User.findOne({ user_id });
+  const group = await Group.findOne({ group_id });
+
+  if (!group) {
+    await Group.create({
+      group_id,
+      group_name: title,
+    });
+  }
 
   if (user && user.role === 'creator') {
     return { target: group_id, message: ADMIN_REGISTERED };
   } else if (user && user.role !== 'creator') {
-    return { target: group_id, message: INVALID_INPUT };
+    return { target: group_id, message: USER_REGISTERED };
   } else {
-    const queryAdministrators = await bot.getChatAdministrators(group_id);
-    const creator = queryAdministrators.find(
-      (item) => item.status === 'creator'
-    );
-    const { first_name, last_name, username } = creator.user;
+    const userData = await bot.getChatMember(group_id, user_id);
+    const { first_name, last_name, username } = userData.user;
     const name = getName({ first_name, last_name });
 
     const record = await Record.create({
       group_id,
     });
-    const newAdmin = await User.create({
+    const newUser = await User.create({
       name,
       user_id,
       username: `@${username}`,
       group_id,
-      role: creator.status,
+      role: userData.status,
       record: record._id,
     });
 
-    await Group.create({
-      group_id,
-      group_name: title,
-      members: [newAdmin._id],
-    });
+    await Group.findOneAndUpdate(
+      { group_id },
+      {
+        $push: { members: newUser._id },
+      }
+    );
 
-    return { target: group_id, message: ADMIN_REGISTRATION_SUCCESS };
+    return {
+      target: group_id,
+      message:
+        userData.status === 'creator' || userData.status === 'admin'
+          ? ADMIN_REGISTRATION_SUCCESS
+          : WELCOME(name, title),
+    };
   }
 }
 

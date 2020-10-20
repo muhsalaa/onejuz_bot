@@ -54,11 +54,11 @@ async function oneJuzBot(msg, bot) {
   }
 
   // unhandled case
-  else {
-    response = { target: msg.chat.id, message: INVALID_INPUT };
-  }
+  // else {
+  //   response = { target: msg.chat.id, message: INVALID_INPUT };
+  // }
 
-  botSend(bot, response);
+  response && botSend(bot, response);
 }
 
 async function newUser(msg, bot) {
