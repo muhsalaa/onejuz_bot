@@ -34,7 +34,7 @@ async function dailyStatisticGenerator(msg, groupIdCron) {
     const { id: user_id } = msg.from;
     const user = await User.findOne({ user_id });
 
-    if (!['creator', 'admin'].includes(user.role)) {
+    if (!user || !['creator', 'admin'].includes(user.role)) {
       return { target: id, message: UNAUTHORIZED };
     } else {
       group_id = id;
