@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="stylesheet" type='text/css' href="style.css" />
+	<title>OneJuz - Bot</title>
+</head>
+
+<body>
+  <section class="hoho">
+
+ 
+	<h1>OneJuz - Bot</h1>
+	<p>Bismillah, OneJuz - Bot adalah aplikasi bot berbasis telegram yang bertujuan memudahkan pelaporan dan pemantauan
+		tilawah bagi komunitas One Day One Juz. Berikut adalah spesifikasi dan cara penggunaan Bot:</p>
+
+	<h3>1. Spesifikasi</h3>
+	<ul>
+		<li>Dibuat dengan Node.JS</li>
+		<li>Database MongoDB</li>
+		<li>Server Heroku (free tier)</li>
+    <li>versi terakhir 1.0.0-alpha.2</li>
+    <li>Project ini open source, repository bisa dilihat <a target="_blank" href="https://github.com/muhsalaa/onejuz_bot">disini</a>, kontribusi sangat dipersilakan.</li>
+	</ul>
+	<blockquote>Catatan: Karena menggunakan server gratis, Bot kadang akan mengalami down pada waktu-waktu tertentu. Ini
+		bersifat sementara sampai Bot sudah masuk versi 1.0.0, nanti akan dipindahkan ke server berbayar tanpa down
+		time.</blockquote>
+
+	<h3>2. Cara penggunaan</h3>
+	<p>Bot ini bekerja dalam grup Telegram, dan akan membalas dengan pesan error apabila digunakan dalam personal chat.
+		Dibawah ini adalah beberapa tata cara penggunaan dan perintah yang dapat dijalankan di bot:
+	</p>
+	<ol>
+    <li>Untuk memasukkan bot kedalam grup, bisa dengan membuka menu add member di pengaturan grup, kemudian cari bot <b>onejuz_bot</b></b></li>
+    <li><a href="#">/register</a> - Saat pertama kali memasukkan bot kedalam grup, ketikkan perintah ini untuk
+			mendaftarkan dirimu ke database. Ini khusus bagi user yang telah berada dalam grup ketika bot dimasukkan.
+			Apabila ada user yang bergabung dengan grup ketika bot sudah ada, maka user tersebut langsung terdaftar.
+		</li>
+		<li>Pelaporan bacaan satuan: kamu bisa mengetikkan langsung juz yang sudah dibaca, misal <b>2</b>. Atau dengan
+			teks seperti <b>Lapor juz 3 kholas</b></li>
+		<li>Pelapuran bacaan multiple: Bot juga memahami pelaporan bacaan sekaligus, misal
+			<b>Lapor juz 2, 3, 4 5 kholas</b>
+		<li><a href="#">/restart</a> ulangi bacaan - Perintah ini untuk mereset bacaan yang sudah dibaca. Misal sudah
+      memasuki romadhon, pingin baca dari juz 1, bisa menggunakan perintah ini.</li>
+    <li><a href="#">/rename</a> Nama Baru - Apabila nama yang kamu daftarkan di telegram salah, kamu bisa menggantinya dengan perintah ini. Karena secara default saat register, nama dari telegram yang akan masuk ke database.</li>
+    <li><a href="#">/renameg</a> Nama Grup Baru - Perintah ini untuk mengganti nama grup jika diperlukan (admin only)</li>
+    <li><a href="#">/statistics</a> - Untuk melihat laporan bacaan harian user (admin only). Setipa hari bot juga akan mengirimkan laporan pada jam 23:59, lalu laporan mingguan akan dikirm hari sabtu jam 23:59.</li>
+    </ol>
+
+    <h3>3. FAQ</h3>
+    Berikut beberapa pertanyaan yang mungkin muncul terkait bot
+
+    <ul>
+      <li><b>Data pribadi apa saja yang disimpan saat mendaftar?</b> Hanya nama, username dan id telegram saja. Apabila user keluar dari grup datanya pun akan terhapus</li>
+      <li><b>Siapa pembuat bot ini?</b> Bot ini dibuat oleh orang pribadi, tidak terkait dengan organisasi apapun</li>
+      <li><b>Apa peran admin setelah ada bot ini?</b> Admin akan tetap berperan untuk memantau laporan dan memotivasi anggota untuk terus membaca qur'an</li>
+    </ul>
+
+    <h3>4. Contact</h3>
+    Apabila ada kritik dan saran bisa disampaikan via <a href="https://t.me/muhsalaa" target="_blank">Telegram</a>
+  </section>
+</body>
+
+</html>
