@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const connectDB = () => {
   mongoose
@@ -9,7 +9,7 @@ const connectDB = () => {
       useUnifiedTopology: true,
     })
     .then(() => {
-      console.log('connected to mongo');
+      console.log("connected to mongo");
     })
     .catch((err) => {
       throw err;
@@ -17,3 +17,5 @@ const connectDB = () => {
 };
 
 module.exports = connectDB;
+
+// test git
