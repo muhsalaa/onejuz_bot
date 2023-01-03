@@ -17,5 +17,3 @@ const connectDB = () => {
 };
 
 module.exports = connectDB;
-
-// test git
